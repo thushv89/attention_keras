@@ -76,7 +76,7 @@ def infer_nmt(encoder_model, decoder_model, test_en_seq, en_vsize, fr_vsize):
     :param fr_vsize: int
     :return:
     """
-    
+
     test_fr_seq = sents2sequences(fr_tokenizer, ['sos'], fr_vsize)
     test_en_onehot_seq = to_categorical(test_en_seq, num_classes=en_vsize)
     test_fr_onehot_seq = np.expand_dims(to_categorical(test_fr_seq, num_classes=fr_vsize), 1)
@@ -125,12 +125,13 @@ def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2
     ax.imshow(attention_mat)
 
     ax.set_xticks(np.arange(attention_mat.shape[1]))
-    ax.set_yticks(np.arange(attention_mat.shape[1]))
+    ax.set_yticks(np.arange(attention_mat.shape[0]))
 
     ax.set_xticklabels([fr_id2word[inp] if inp != 0 else "<Res>" for inp in dec_inputs])
-    ax.set_yticklabels([en_id2word[inp] if inp != 0 else "<Res>" for inp in encoder_inputs.reshape(-1)])
+    ax.set_yticklabels([en_id2word[inp] if inp != 0 else "<Res>" for inp in encoder_inputs.ravel()])
 
     ax.tick_params(labelsize=32)
+    ax.tick_params(axis='x', labelrotation=90)
 
     if not os.path.exists(os.path.join('..', 'results')):
         os.mkdir(os.path.join('..', 'results'))
@@ -139,12 +140,13 @@ def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2
 
 if __name__ == '__main__':
 
+    """ Hyperparameters """
     batch_size = 64
     hidden_size = 96
     en_timesteps, fr_timesteps = 20, 20
 
     filename = ''
-    tr_en_text, tr_fr_text, ts_en_text, ts_fr_text = get_data(train_size=10000)
+    tr_en_text, tr_fr_text, ts_en_text, ts_fr_text = get_data(train_size=100000)
 
     """ Defining tokenizers """
     en_tokenizer = keras.preprocessing.text.Tokenizer(oov_token='UNK')
@@ -156,18 +158,19 @@ if __name__ == '__main__':
     """ Getting preprocessed data """
     en_seq, fr_seq = preprocess_data(en_tokenizer, fr_tokenizer, tr_en_text, tr_fr_text, en_timesteps, fr_timesteps)
 
-    """ Hyperparameters """
     en_vsize = max(en_tokenizer.index_word.keys()) + 1
     fr_vsize = max(fr_tokenizer.index_word.keys()) + 1
 
     """ Defining the full model """
-    full_model, infer_enc_model, infer_dec_model = define_nmt(hidden_size=hidden_size, batch_size=batch_size,
-                            en_timesteps=en_timesteps, fr_timesteps=fr_timesteps,
-                            en_vsize=en_vsize, fr_vsize=fr_vsize)
+    full_model, infer_enc_model, infer_dec_model = define_nmt(
+        hidden_size=hidden_size, batch_size=batch_size,
+        en_timesteps=en_timesteps, fr_timesteps=fr_timesteps,
+        en_vsize=en_vsize, fr_vsize=fr_vsize)
 
     n_epochs = 10
     train(full_model, en_seq, fr_seq, batch_size, n_epochs)
 
+    """ Save model """
     if not os.path.exists(os.path.join('..', 'h5.models')):
         os.mkdir(os.path.join('..', 'h5.models'))
     full_model.save(os.path.join('..', 'h5.models', 'nmt.h5'))
@@ -182,12 +185,10 @@ if __name__ == '__main__':
 
     test_en_seq = sents2sequences(en_tokenizer, [test_en], pad_length=en_timesteps)
     print(test_en_seq)
-    test_fr, attn_weights = infer_nmt(infer_enc_model,infer_dec_model, test_en_seq,
-              en_vsize, fr_vsize)
+    test_fr, attn_weights = infer_nmt(
+        encoder_model=infer_enc_model, decoder_model=infer_dec_model,
+        test_en_seq=test_en_seq, en_vsize=en_vsize, fr_vsize=fr_vsize)
     print('\tFrench: {}'.format(test_fr))
 
     """ Attention plotting """
-    en_index2word = dict(zip(en_tokenizer.word_index.values(), en_tokenizer.word_index.keys()))
-    fr_index2word = dict(zip(fr_tokenizer.word_index.values(), fr_tokenizer.word_index.keys()))
-
     plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word)

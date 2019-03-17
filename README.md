@@ -2,11 +2,12 @@
 
 ## Version (s)
 
-- TensorFlow: 1.12.0
+- TensorFlow: 1.12.0 (Tested)
+- TensorFlow: 2.0 (Should be easily portable as all the backend functions are availalbe in TF 2.0. However has not been tested yet.)
 
 ## Introduction
 
-This is an implementation of Attention (only supports Bahdanau Attention right now)
+This is an implementation of Attention (only supports [Bahdanau Attention](https://arxiv.org/pdf/1409.0473.pdf) right now)
 
 ## Project structure
 
@@ -19,7 +20,8 @@ layers
 model
  |--- nmt.py (NMT model defined with Attention)
  |--- train_nmt.py ( Code for training/inferring/plotting attention with NMT model)
-h5.models (created to store model)
+h5.models (created by train_nmt.py to store model)
+results (created by train_nmt.py to store model)
 
 ```
 ## How to use

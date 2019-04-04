@@ -56,7 +56,7 @@ class AttentionLayer(Layer):
             """ Computing S.Wa where S=[s0, s1, ..., si]"""
             # <= batch_size*en_seq_len, latent_dim
             reshaped_enc_outputs = K.reshape(encoder_out_seq, (batch_size * en_seq_len, en_hidden))
-            # <= batch_size*en_seq_len, latent_dim
+            # <= batch_size, en_seq_len, latent_dim
             W_a_dot_s = K.reshape(K.dot(reshaped_enc_outputs, self.W_a), (batch_size, en_seq_len, en_hidden))
             if verbose:
                 print('wa.s>',W_a_dot_s.shape)
@@ -111,6 +111,6 @@ class AttentionLayer(Layer):
     def compute_output_shape(self, input_shape):
         """ Outputs produced by the layer """
         return [
-            tf.TensorShape((input_shape[1][0], input_shape[1][1], input_shape[1][2])),
+            tf.TensorShape((input_shape[1][0], input_shape[1][1], input_shape[0][2])),
             tf.TensorShape((input_shape[1][0], input_shape[1][1], input_shape[0][1]))
         ]

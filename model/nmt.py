@@ -7,8 +7,12 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     """ Defining a NMT model """
 
     # Define an input sequence and process it.
-    encoder_inputs = Input(batch_shape=(batch_size, en_timesteps, en_vsize), name='encoder_inputs')
-    decoder_inputs = Input(batch_shape=(batch_size, fr_timesteps - 1, fr_vsize), name='decoder_inputs')
+    if batch_size:
+        encoder_inputs = Input(batch_shape=(batch_size, en_timesteps, en_vsize), name='encoder_inputs')
+        decoder_inputs = Input(batch_shape=(batch_size, fr_timesteps - 1, fr_vsize), name='decoder_inputs')
+    else:
+        encoder_inputs = Input(shape=(en_timesteps, en_vsize), name='encoder_inputs')
+        decoder_inputs = Input(shape=(fr_timesteps - 1, fr_vsize), name='decoder_inputs')
 
     # Encoder GRU
     encoder_gru = GRU(hidden_size, return_sequences=True, return_state=True, name='encoder_gru')
@@ -62,4 +66,4 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
 if __name__ == '__main__':
 
     """ Checking nmt model for toy example """
-    define_nmt(64, 32, 20, 30, 20, 20)
+    define_nmt(64, None, 20, 30, 20, 20)

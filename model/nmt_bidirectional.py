@@ -7,8 +7,12 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     """ Defining a NMT model """
 
     # Define an input sequence and process it.
-    encoder_inputs = Input(batch_shape=(batch_size, en_timesteps, en_vsize), name='encoder_inputs')
-    decoder_inputs = Input(batch_shape=(batch_size, fr_timesteps - 1, fr_vsize), name='decoder_inputs')
+    if batch_size:
+        encoder_inputs = Input(batch_shape=(batch_size, en_timesteps, en_vsize), name='encoder_inputs')
+        decoder_inputs = Input(batch_shape=(batch_size, fr_timesteps - 1, fr_vsize), name='decoder_inputs')
+    else:
+        encoder_inputs = Input(shape=(en_timesteps, en_vsize), name='encoder_inputs')
+        decoder_inputs = Input(shape=(fr_timesteps - 1, fr_vsize), name='decoder_inputs')
 
     # Encoder GRU
     encoder_gru = Bidirectional(GRU(hidden_size, return_sequences=True, return_state=True, name='encoder_gru'), name='bidirectional_encoder')
@@ -60,33 +64,7 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     return full_model, encoder_model, decoder_model
 
 
-def define_nmt2(maxlen):
-
-    input_1 = Input(shape=(maxlen,), name="input1")
-    x = Embedding(25000, 128, input_length=maxlen, name='embedding_1', trainable=False)(input_1)
-    encoder_out, forward_h, backward_h = Bidirectional(GRU(32, return_sequences=True, return_state=True))(x)
-    decoder_out, forward_h, backward_h = Bidirectional(GRU(32, return_sequences=True, return_state=True))(x,
-                                                                                                          initial_state=[
-                                                                                                              forward_h,
-                                                                                                              backward_h])
-    print('encoder_out > ', encoder_out.shape)
-    print('decoder_out > ', decoder_out.shape)
-
-    attn_out, attn_states = AttentionLayer()([encoder_out, decoder_out])
-    a = Concatenate([decoder_out, attn_out], axis=1)
-
-    dense = Dense(25000, activation='softmax', name='softmax_layer')
-    dense_time = TimeDistributed(dense, name='time_distributed_layer')
-    decoder_pred = dense_time(a)
-
-    # Full model
-    full_model = Model(inputs=x, outputs=decoder_pred)
-    full_model.compile(optimizer='adam', loss='categorical_crossentropy')
-
-    full_model.summary()
-
 if __name__ == '__main__':
 
     """ Checking nmt model for toy example """
-    #define_nmt(64, 32, 20, 30, 20, 20)
-    define_nmt2(100)
+    define_nmt(64, None, 20, 30, 20, 20)

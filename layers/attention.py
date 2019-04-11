@@ -55,9 +55,9 @@ class AttentionLayer(Layer):
 
             """ Computing S.Wa where S=[s0, s1, ..., si]"""
             # <= batch_size*en_seq_len, latent_dim
-            reshaped_enc_outputs = K.reshape(encoder_out_seq, (batch_size * en_seq_len, en_hidden))
+            reshaped_enc_outputs = K.reshape(encoder_out_seq, (-1, en_hidden))
             # <= batch_size*en_seq_len, latent_dim
-            W_a_dot_s = K.reshape(K.dot(reshaped_enc_outputs, self.W_a), (batch_size, en_seq_len, en_hidden))
+            W_a_dot_s = K.reshape(K.dot(reshaped_enc_outputs, self.W_a), (-1, en_seq_len, en_hidden))
             if verbose:
                 print('wa.s>',W_a_dot_s.shape)
 
@@ -68,13 +68,13 @@ class AttentionLayer(Layer):
 
             """ tanh(S.Wa + hj.Ua) """
             # <= batch_size*en_seq_len, latent_dim
-            reshaped_Ws_plus_Uh = K.tanh(K.reshape(W_a_dot_s + U_a_dot_h, (batch_size * en_seq_len, en_hidden)))
+            reshaped_Ws_plus_Uh = K.tanh(K.reshape(W_a_dot_s + U_a_dot_h, (-1, en_hidden)))
             if verbose:
                 print('Ws+Uh>', reshaped_Ws_plus_Uh.shape)
 
             """ softmax(va.tanh(S.Wa + hj.Ua)) """
             # <= batch_size, en_seq_len
-            e_i = K.reshape(K.dot(reshaped_Ws_plus_Uh, self.V_a), (batch_size, en_seq_len))
+            e_i = K.reshape(K.dot(reshaped_Ws_plus_Uh, self.V_a), (-1, en_seq_len))
             # <= batch_size, en_seq_len
             e_i = K.softmax(e_i)
 
@@ -91,9 +91,16 @@ class AttentionLayer(Layer):
                 print('ci>', c_i.shape)
             return c_i, [c_i]
 
-        # We are not using initial states, but need to pass something to K.rnn funciton
-        fake_state_c = K.zeros(shape=(encoder_out_seq.shape[0], encoder_out_seq.shape[-1]))
-        fake_state_e = K.zeros(shape=(encoder_out_seq.shape[0], encoder_out_seq.shape[1]))
+        def create_inital_state(inputs, hidden_size):
+            # We are not using initial states, but need to pass something to K.rnn funciton
+            fake_state = K.zeros_like(inputs) # <= (batch_size, enc_seq_len, latent_dim
+            fake_state = K.sum(fake_state, axis=[1, 2]) # <= (batch_size)
+            fake_state = K.expand_dims(fake_state) # <= (batch_size, 1)
+            fake_state = K.tile(fake_state, [1, hidden_size]) # <= (batch_size, latent_dim
+            return fake_state
+
+        fake_state_c = create_inital_state(encoder_out_seq, encoder_out_seq.shape[-1])
+        fake_state_e = create_inital_state(encoder_out_seq, encoder_out_seq.shape[1]) # <= (batch_size, enc_seq_len, latent_dim
 
         """ Computing energy outputs """
         # e_outputs => (batch_size, de_seq_len, en_seq_len)

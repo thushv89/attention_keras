@@ -49,7 +49,6 @@ class AttentionLayer(Layer):
             assert isinstance(states, list) or isinstance(states, tuple), assert_msg
 
             """ Some parameters required for shaping tensors"""
-            batch_size = encoder_out_seq.shape[0]
             en_seq_len, en_hidden = encoder_out_seq.shape[1], encoder_out_seq.shape[2]
             de_hidden = inputs.shape[-1]
 
@@ -93,14 +92,14 @@ class AttentionLayer(Layer):
 
         def create_inital_state(inputs, hidden_size):
             # We are not using initial states, but need to pass something to K.rnn funciton
-            fake_state = K.zeros_like(inputs) # <= (batch_size, enc_seq_len, latent_dim
-            fake_state = K.sum(fake_state, axis=[1, 2]) # <= (batch_size)
-            fake_state = K.expand_dims(fake_state) # <= (batch_size, 1)
-            fake_state = K.tile(fake_state, [1, hidden_size]) # <= (batch_size, latent_dim
+            fake_state = K.zeros_like(inputs)  # <= (batch_size, enc_seq_len, latent_dim
+            fake_state = K.sum(fake_state, axis=[1, 2])  # <= (batch_size)
+            fake_state = K.expand_dims(fake_state)  # <= (batch_size, 1)
+            fake_state = K.tile(fake_state, [1, hidden_size])  # <= (batch_size, latent_dim
             return fake_state
 
         fake_state_c = create_inital_state(encoder_out_seq, encoder_out_seq.shape[-1])
-        fake_state_e = create_inital_state(encoder_out_seq, encoder_out_seq.shape[1]) # <= (batch_size, enc_seq_len, latent_dim
+        fake_state_e = create_inital_state(encoder_out_seq, encoder_out_seq.shape[1])  # <= (batch_size, enc_seq_len, latent_dim
 
         """ Computing energy outputs """
         # e_outputs => (batch_size, de_seq_len, en_seq_len)

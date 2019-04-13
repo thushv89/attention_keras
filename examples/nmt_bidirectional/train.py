@@ -88,13 +88,14 @@ def infer_nmt(encoder_model, decoder_model, test_en_seq, en_vsize, fr_vsize):
     test_en_onehot_seq = to_categorical(test_en_seq, num_classes=en_vsize)
     test_fr_onehot_seq = np.expand_dims(to_categorical(test_fr_seq, num_classes=fr_vsize), 1)
 
-    enc_outs, enc_last_state = encoder_model.predict(test_en_onehot_seq)
-    dec_state = enc_last_state
+    enc_outs, enc_fwd_state, enc_back_state = encoder_model.predict(test_en_onehot_seq)
+    dec_fwd_state, dec_back_state = enc_fwd_state, enc_back_state
     attention_weights = []
     fr_text = ''
     for i in range(20):
 
-        dec_out, attention, dec_state = decoder_model.predict([enc_outs, dec_state, test_fr_onehot_seq])
+        dec_out, attention, dec_fwd_state, dec_back_state = decoder_model.predict(
+            [enc_outs, dec_fwd_state, dec_back_state, test_fr_onehot_seq])
         dec_ind = np.argmax(dec_out, axis=-1)[0, 0]
 
         if dec_ind == 0:
@@ -109,7 +110,7 @@ def infer_nmt(encoder_model, decoder_model, test_en_seq, en_vsize, fr_vsize):
 
 
 if __name__ == '__main__':
-    debug = True
+    debug = False
     """ Hyperparameters """
     batch_size = 64
     hidden_size = 96
@@ -137,7 +138,7 @@ if __name__ == '__main__':
         en_timesteps=en_timesteps, fr_timesteps=fr_timesteps,
         en_vsize=en_vsize, fr_vsize=fr_vsize)
 
-    n_epochs = 10 if not debug else 3
+    n_epochs = 5 if not debug else 3
     train(full_model, en_seq, fr_seq, batch_size, n_epochs)
 
     """ Save model """

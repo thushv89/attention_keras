@@ -1,0 +1,27 @@
+version: 1
+formatters:
+  console:
+    format: '%(name)s | %(levelname)s | %(message)s'
+  file:
+    format: '%(asctime)s | %(name)s | %(funcName)s | %(levelname)s | %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: console
+    stream: ext://sys.stdout
+  file:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: file
+    filename: log.log
+
+loggers:
+  simpleLogger:
+    level: DEBUG
+    handlers: [console, file]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console, file]

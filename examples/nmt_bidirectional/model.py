@@ -1,4 +1,4 @@
-from tensorflow.python.keras.layers import Input, GRU, Dense, Concatenate, TimeDistributed, Bidirectional, Embedding
+from tensorflow.python.keras.layers import Input, GRU, Dense, Concatenate, TimeDistributed, Bidirectional
 from tensorflow.python.keras.models import Model
 from layers.attention import AttentionLayer
 
@@ -66,5 +66,5 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
 
 if __name__ == '__main__':
 
-    """ Checking nmt model for toy example """
+    """ Checking nmt model for toy examples """
     define_nmt(64, None, 20, 30, 20, 20)

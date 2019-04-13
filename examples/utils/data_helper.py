@@ -21,3 +21,4 @@ def sents2sequences(tokenizer, sentences, reverse=False, pad_length=None, paddin
         preproc_text = np.flip(preproc_text, axis=1)
 
     return preproc_text
+

@@ -17,9 +17,13 @@ data (Download data and place it here)
  |--- small_vocab_fr.txt
 layers
  |--- attention.py (Attention implementation)
-model
- |--- nmt.py (NMT model defined with Attention)
- |--- train_nmt.py ( Code for training/inferring/plotting attention with NMT model)
+examples
+ |--- nmt
+   |--- model.py (NMT model defined with Attention)
+   |--- train.py ( Code for training/inferring/plotting attention with NMT model)
+ |--- nmt_bidirectional
+   |--- model.py (NMT birectional model defined with Attention)
+   |--- train.py ( Code for training/inferring/plotting attention with NMT model)
 h5.models (created by train_nmt.py to store model)
 results (created by train_nmt.py to store model)
 

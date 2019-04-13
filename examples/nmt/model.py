@@ -65,5 +65,5 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
 
 if __name__ == '__main__':
 
-    """ Checking nmt model for toy example """
+    """ Checking nmt model for toy examples """
     define_nmt(64, None, 20, 30, 20, 20)

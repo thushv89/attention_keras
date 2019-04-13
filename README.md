@@ -33,7 +33,7 @@ results (created by train_nmt.py to store model)
 Just like you would use any other `tensoflow.python.keras.layers` object.
 
 ```python
-from attention_keras.layers import AttentionLayer
+from attention_keras.layers.attention import AttentionLayer
 
 attn_layer = AttentionLayer(name='attention_layer')
 attn_out, attn_states = attn_layer([encoder_outputs, decoder_outputs])

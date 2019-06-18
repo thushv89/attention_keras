@@ -19,8 +19,10 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     encoder_out, encoder_fwd_state, encoder_back_state = encoder_gru(encoder_inputs)
 
     # Set up the decoder GRU, using `encoder_states` as initial state.
-    decoder_gru = Bidirectional(GRU(hidden_size, return_sequences=True, return_state=True, name='decoder_gru'), name='bidirectional_decoder')
-    decoder_out, decoder_fwd_state, decoder_back_state = decoder_gru(decoder_inputs, initial_state=[encoder_fwd_state, encoder_back_state])
+    decoder_gru = GRU(hidden_size*2, return_sequences=True, return_state=True, name='decoder_gru')
+    decoder_out, decoder_state = decoder_gru(
+        decoder_inputs, initial_state=Concatenate(axis=-1)([encoder_fwd_state, encoder_back_state])
+    )
 
     # Attention layer
     attn_layer = AttentionLayer(name='attention_layer')
@@ -51,15 +53,15 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     """ Decoder (Inference) model """
     decoder_inf_inputs = Input(batch_shape=(batch_size, 1, fr_vsize), name='decoder_word_inputs')
     encoder_inf_states = Input(batch_shape=(batch_size, en_timesteps, 2*hidden_size), name='encoder_inf_states')
-    decoder_init_fwd_state = Input(batch_shape=(batch_size, hidden_size), name='decoder_fwd_init')
-    decoder_init_back_state = Input(batch_shape=(batch_size, hidden_size), name='decoder_back_init')
+    decoder_init_state = Input(batch_shape=(batch_size, 2*hidden_size), name='decoder_init')
 
-    decoder_inf_out, decoder_inf_fwd_state, decoder_inf_back_state = decoder_gru(decoder_inf_inputs, initial_state=[decoder_init_fwd_state, decoder_init_back_state])
+    decoder_inf_out, decoder_inf_state = decoder_gru(
+        decoder_inf_inputs, initial_state=decoder_init_state)
     attn_inf_out, attn_inf_states = attn_layer([encoder_inf_states, decoder_inf_out])
     decoder_inf_concat = Concatenate(axis=-1, name='concat')([decoder_inf_out, attn_inf_out])
     decoder_inf_pred = TimeDistributed(dense)(decoder_inf_concat)
-    decoder_model = Model(inputs=[encoder_inf_states, decoder_init_fwd_state, decoder_init_back_state, decoder_inf_inputs],
-                          outputs=[decoder_inf_pred, attn_inf_states, decoder_inf_fwd_state, decoder_inf_back_state])
+    decoder_model = Model(inputs=[encoder_inf_states, decoder_init_state, decoder_inf_inputs],
+                          outputs=[decoder_inf_pred, attn_inf_states, decoder_inf_state])
 
     return full_model, encoder_model, decoder_model
 

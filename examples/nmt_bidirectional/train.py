@@ -13,7 +13,12 @@ from examples.nmt_bidirectional.model import define_nmt
 from examples.utils.model_helper import plot_attention_weights
 from examples.utils.logger import get_logger
 
-logger = get_logger("examples.nmt_bidirectional.train", os.path.join('..', '..', 'logs'))
+base_dir = os.path.join(os.path.abspath(__file__).split(os.path.sep)[:-3])
+logger = get_logger("examples.nmt_bidirectional.train", os.path.join(base_dir, 'logs'))
+
+batch_size = 64
+hidden_size = 96
+en_timesteps, fr_timesteps = 20, 20
 
 
 def get_data(train_size, random_seed=100):
@@ -23,7 +28,7 @@ def get_data(train_size, random_seed=100):
     fr_text = read_data(os.path.join(project_path, 'data', 'small_vocab_fr.txt'))
     logger.info('Length of text: {}'.format(len(en_text)))
 
-    fr_text = ['sos ' + sent[:-1] + 'eos .'  if sent.endswith('.') else 'sos ' + sent + ' eos .' for sent in fr_text]
+    fr_text = ['sos ' + sent[:-1] + 'eos' if sent.endswith('.') else 'sos ' + sent + ' eos' for sent in fr_text]
 
     np.random.seed(random_seed)
     inds = np.arange(len(en_text))
@@ -37,6 +42,10 @@ def get_data(train_size, random_seed=100):
     ts_en_text = [en_text[ti] for ti in test_inds]
     ts_fr_text = [fr_text[ti] for ti in test_inds]
 
+    logger.info("Average length of an English sentence: {}".format(
+        np.mean([len(en_sent.split(" ")) for en_sent in tr_en_text])))
+    logger.info("Average length of a French sentence: {}".format(
+        np.mean([len(fr_sent.split(" ")) for fr_sent in tr_fr_text])))
     return tr_en_text, tr_fr_text, ts_en_text, ts_fr_text
 
 
@@ -89,13 +98,14 @@ def infer_nmt(encoder_model, decoder_model, test_en_seq, en_vsize, fr_vsize):
     test_fr_onehot_seq = np.expand_dims(to_categorical(test_fr_seq, num_classes=fr_vsize), 1)
 
     enc_outs, enc_fwd_state, enc_back_state = encoder_model.predict(test_en_onehot_seq)
-    dec_fwd_state, dec_back_state = enc_fwd_state, enc_back_state
+    dec_state = np.concatenate([enc_fwd_state, enc_back_state], axis=-1)
     attention_weights = []
     fr_text = ''
-    for i in range(20):
 
-        dec_out, attention, dec_fwd_state, dec_back_state = decoder_model.predict(
-            [enc_outs, dec_fwd_state, dec_back_state, test_fr_onehot_seq])
+    for i in range(fr_timesteps):
+
+        dec_out, attention, dec_state = decoder_model.predict(
+            [enc_outs, dec_state, test_fr_onehot_seq])
         dec_ind = np.argmax(dec_out, axis=-1)[0, 0]
 
         if dec_ind == 0:
@@ -111,10 +121,9 @@ def infer_nmt(encoder_model, decoder_model, test_en_seq, en_vsize, fr_vsize):
 
 if __name__ == '__main__':
     debug = False
+
     """ Hyperparameters """
-    batch_size = 64
-    hidden_size = 96
-    en_timesteps, fr_timesteps = 20, 20
+
     train_size = 100000 if not debug else 10000
     filename = ''
     tr_en_text, tr_fr_text, ts_en_text, ts_fr_text = get_data(train_size=train_size)
@@ -138,7 +147,7 @@ if __name__ == '__main__':
         en_timesteps=en_timesteps, fr_timesteps=fr_timesteps,
         en_vsize=en_vsize, fr_vsize=fr_vsize)
 
-    n_epochs = 5 if not debug else 3
+    n_epochs = 10 if not debug else 3
     train(full_model, en_seq, fr_seq, batch_size, n_epochs)
 
     """ Save model """
@@ -151,14 +160,19 @@ if __name__ == '__main__':
     fr_index2word = dict(zip(fr_tokenizer.word_index.values(), fr_tokenizer.word_index.keys()))
 
     """ Inferring with trained model """
-    test_en = ts_en_text[0]
-    logger.info('Translating: {}'.format(test_en))
 
-    test_en_seq = sents2sequences(en_tokenizer, [test_en], pad_length=en_timesteps)
-    test_fr, attn_weights = infer_nmt(
-        encoder_model=infer_enc_model, decoder_model=infer_dec_model,
-        test_en_seq=test_en_seq, en_vsize=en_vsize, fr_vsize=fr_vsize)
-    logger.info('\tFrench: {}'.format(test_fr))
+    np.random.seed(100)
+    rand_test_ids = np.random.randint(0, len(ts_en_text), size=10)
+    for rid in rand_test_ids:
+        test_en = ts_en_text[rid]
+        logger.info('\nTranslating: {}'.format(test_en))
 
-    """ Attention plotting """
-    plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word)
+        test_en_seq = sents2sequences(en_tokenizer, [test_en], pad_length=en_timesteps)
+        test_fr, attn_weights = infer_nmt(
+            encoder_model=infer_enc_model, decoder_model=infer_dec_model,
+            test_en_seq=test_en_seq, en_vsize=en_vsize, fr_vsize=fr_vsize)
+        logger.info('\tFrench: {}'.format(test_fr))
+
+        """ Attention plotting """
+        plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word,
+                               base_dir=base_dir, filename='attention_{}.png'.format(rid))

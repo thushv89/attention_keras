@@ -13,7 +13,12 @@ from examples.nmt.model import define_nmt
 from examples.utils.model_helper import plot_attention_weights
 from examples.utils.logger import get_logger
 
-logger = get_logger("examples.nmt.train",os.path.join('..', '..', 'logs'))
+base_dir = os.path.join(os.path.abspath(__file__).split(os.path.sep)[:-3])
+logger = get_logger("examples.nmt.train",os.path.join(base_dir, 'logs'))
+
+batch_size = 64
+hidden_size = 96
+en_timesteps, fr_timesteps = 20, 20
 
 def get_data(train_size, random_seed=100):
 
@@ -111,9 +116,7 @@ if __name__ == '__main__':
 
     debug = True
     """ Hyperparameters """
-    batch_size = 64
-    hidden_size = 96
-    en_timesteps, fr_timesteps = 20, 20
+
     train_size = 100000 if not debug else 10000
     filename = ''
 
@@ -161,4 +164,4 @@ if __name__ == '__main__':
     logger.info('\tFrench: {}'.format(test_fr))
 
     """ Attention plotting """
-    plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word)
+    plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word, base_dir=base_dir)

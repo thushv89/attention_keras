@@ -13,12 +13,12 @@ from examples.nmt.model import define_nmt
 from examples.utils.model_helper import plot_attention_weights
 from examples.utils.logger import get_logger
 
-base_dir = os.path.join(os.path.abspath(__file__).split(os.path.sep)[:-3])
+base_dir = os.path.sep.join(os.path.abspath(__file__).split(os.path.sep)[:-3])
 logger = get_logger("examples.nmt.train",os.path.join(base_dir, 'logs'))
 
 batch_size = 64
 hidden_size = 96
-en_timesteps, fr_timesteps = 20, 20
+en_timesteps, fr_timesteps = 15, 20
 
 def get_data(train_size, random_seed=100):
 

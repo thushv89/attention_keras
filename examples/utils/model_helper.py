@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2word):
+def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2word, base_dir, filename=None):
     """
     Plots attention weights
     :param encoder_inputs: Sequence of word ids (list/numpy.ndarray)
@@ -13,8 +13,10 @@ def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2
     :return:
     """
 
-    assert_msg ='Your attention weights was empty. Please check if the decoder produced  a proper translation'
-    assert len(attention_weights) != 0, assert_msg
+    if len(attention_weights) == 0:
+        print('Your attention weights was empty. No attention map saved to the disk. ' +
+              '\nPlease check if the decoder produced  a proper translation')
+        return
 
     mats = []
     dec_inputs = []
@@ -35,6 +37,9 @@ def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2
     ax.tick_params(labelsize=32)
     ax.tick_params(axis='x', labelrotation=90)
 
-    if not os.path.exists(os.path.join('..', 'results')):
-        os.mkdir(os.path.join('..', 'results'))
-    plt.savefig(os.path.join('..', 'results', 'attention.png'))
+    if not os.path.exists(os.path.join(base_dir, 'results')):
+        os.mkdir(os.path.join(base_dir, 'results'))
+    if filename is None:
+        plt.savefig(os.path.join(base_dir, 'results', 'attention.png'))
+    else:
+        plt.savefig(os.path.join(base_dir, 'results', '{}'.format(filename)))

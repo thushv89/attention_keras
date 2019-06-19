@@ -18,7 +18,7 @@ logger = get_logger("examples.nmt.train",os.path.join(base_dir, 'logs'))
 
 batch_size = 64
 hidden_size = 96
-en_timesteps, fr_timesteps = 15, 20
+en_timesteps, fr_timesteps = 20, 20
 
 def get_data(train_size, random_seed=100):
 

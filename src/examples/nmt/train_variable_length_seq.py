@@ -171,14 +171,13 @@ if __name__ == '__main__':
 
     n_epochs = 10 if not debug else 3
     for ep in range(n_epochs):
-        if ep==0:
+        logger.info("Running main epoch {}".format(ep))
+        if ep == 0:
             logger.info("Training with {},{}".format(en_1_timesteps, fr_1_timesteps))
-        train(full_model, en_seq_1, fr_seq_1, batch_size, 1)
-        if ep == 0:
             logger.info("Training with {},{}".format(en_2_timesteps, fr_2_timesteps))
-        train(full_model, en_seq_2, fr_seq_2, batch_size, 1)
-        if ep == 0:
             logger.info("Training with {},{}".format(en_3_timesteps, fr_3_timesteps))
+        train(full_model, en_seq_1, fr_seq_1, batch_size, 1)
+        train(full_model, en_seq_2, fr_seq_2, batch_size, 1)
         train(full_model, en_seq_3, fr_seq_3, batch_size, 1)
 
     """ Save model """

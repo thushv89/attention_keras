@@ -4,7 +4,7 @@ from tensorflow.python.keras.utils import to_categorical
 import numpy as np
 import os, sys
 
-project_path = os.path.sep.join(os.path.abspath(__file__).split(os.path.sep)[:-3])
+project_path = os.path.sep.join(os.path.abspath(__file__).split(os.path.sep)[:-4])
 if project_path not in sys.path:
     sys.path.append(project_path)
 
@@ -137,8 +137,8 @@ if __name__ == '__main__':
 
     """ Defining the full model """
     full_model, infer_enc_model, infer_dec_model = define_nmt(
-        hidden_size=hidden_size, batch_size=batch_size,
-        en_timesteps=en_timesteps, fr_timesteps=fr_timesteps,
+        hidden_size=hidden_size, batch_size=None,
+        en_timesteps=None, fr_timesteps=None,
         en_vsize=en_vsize, fr_vsize=fr_vsize)
 
     n_epochs = 10 if not debug else 3

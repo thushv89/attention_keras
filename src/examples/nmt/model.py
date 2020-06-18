@@ -12,7 +12,10 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
         decoder_inputs = Input(batch_shape=(batch_size, fr_timesteps - 1, fr_vsize), name='decoder_inputs')
     else:
         encoder_inputs = Input(shape=(en_timesteps, en_vsize), name='encoder_inputs')
-        decoder_inputs = Input(shape=(fr_timesteps - 1, fr_vsize), name='decoder_inputs')
+        if fr_timesteps:
+            decoder_inputs = Input(shape=(fr_timesteps - 1, fr_vsize), name='decoder_inputs')
+        else:
+            decoder_inputs = Input(shape=(None, fr_vsize), name='decoder_inputs')
 
     # Encoder GRU
     encoder_gru = GRU(hidden_size, return_sequences=True, return_state=True, name='encoder_gru')

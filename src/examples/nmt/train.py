@@ -4,44 +4,23 @@ from tensorflow.python.keras.utils import to_categorical
 import numpy as np
 import os, sys
 
-project_path = os.path.sep.join(os.path.abspath(__file__).split(os.path.sep)[:-3])
+project_path = os.environ.get("PWD")
 if project_path not in sys.path:
     sys.path.append(project_path)
 
-from examples.utils.data_helper import read_data, sents2sequences
+from examples.utils.data_helper import read_data, sents2sequences, get_data
 from examples.nmt.model import define_nmt
 from examples.utils.model_helper import plot_attention_weights
 from examples.utils.logger import get_logger
+from examples.utils.config import Config
 
-base_dir = os.path.sep.join(os.path.abspath(__file__).split(os.path.sep)[:-4])
-logger = get_logger("examples.nmt.train",os.path.join(base_dir, 'logs'))
+config = Config()
+
+logger = get_logger("examples.nmt.train", config.LOGS_DIR)
 
 batch_size = 64
 hidden_size = 96
 en_timesteps, fr_timesteps = 20, 20
-
-def get_data(train_size, random_seed=100):
-
-    """ Getting randomly shuffled training / testing data """
-    en_text = read_data(os.path.join(project_path, 'data', 'small_vocab_en.txt'))
-    fr_text = read_data(os.path.join(project_path, 'data', 'small_vocab_fr.txt'))
-    logger.info('Length of text: {}'.format(len(en_text)))
-
-    fr_text = ['sos ' + sent[:-1] + 'eos .'  if sent.endswith('.') else 'sos ' + sent + ' eos .' for sent in fr_text]
-
-    np.random.seed(random_seed)
-    inds = np.arange(len(en_text))
-    np.random.shuffle(inds)
-
-    train_inds = inds[:train_size]
-    test_inds = inds[train_size:]
-    tr_en_text = [en_text[ti] for ti in train_inds]
-    tr_fr_text = [fr_text[ti] for ti in train_inds]
-
-    ts_en_text = [en_text[ti] for ti in test_inds]
-    ts_fr_text = [fr_text[ti] for ti in test_inds]
-
-    return tr_en_text, tr_fr_text, ts_en_text, ts_fr_text
 
 
 def preprocess_data(en_tokenizer, fr_tokenizer, en_text, fr_text, en_timesteps, fr_timesteps):
@@ -145,9 +124,9 @@ if __name__ == '__main__':
     train(full_model, en_seq, fr_seq, batch_size, n_epochs)
 
     """ Save model """
-    if not os.path.exists(os.path.join('..', 'h5.models')):
-        os.mkdir(os.path.join('..', 'h5.models'))
-    full_model.save(os.path.join('..', 'h5.models', 'nmt.h5'))
+    if not os.path.exists(config.MODELS_DIR):
+        os.mkdir(config.MODELS_DIR)
+    full_model.save(os.path.join(config.MODELS_DIR, 'nmt.h5'))
 
     """ Index2word """
     en_index2word = dict(zip(en_tokenizer.word_index.values(), en_tokenizer.word_index.keys()))
@@ -164,4 +143,4 @@ if __name__ == '__main__':
     logger.info('\tFrench: {}'.format(test_fr))
 
     """ Attention plotting """
-    plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word, base_dir=base_dir)
+    plot_attention_weights(test_en_seq, attn_weights, en_index2word, fr_index2word)

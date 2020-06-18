@@ -1,9 +1,11 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from examples.utils.config import Config
 
+config = Config()
 
-def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2word, base_dir, filename=None):
+def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2word, filename=None):
     """
     Plots attention weights
     :param encoder_inputs: Sequence of word ids (list/numpy.ndarray)
@@ -37,9 +39,9 @@ def plot_attention_weights(encoder_inputs, attention_weights, en_id2word, fr_id2
     ax.tick_params(labelsize=32)
     ax.tick_params(axis='x', labelrotation=90)
 
-    if not os.path.exists(os.path.join(base_dir, 'results')):
-        os.mkdir(os.path.join(base_dir, 'results'))
+    if not os.path.exists(config.RESULTS_DIR):
+        os.mkdir(config.RESULTS_DIR)
     if filename is None:
-        plt.savefig(os.path.join(base_dir, 'results', 'attention.png'))
+        plt.savefig(os.path.join(config.RESULTS_DIR, 'attention.png'))
     else:
-        plt.savefig(os.path.join(base_dir, 'results', '{}'.format(filename)))
+        plt.savefig(os.path.join(config.RESULTS_DIR, '{}'.format(filename)))

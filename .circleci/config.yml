@@ -11,6 +11,6 @@ jobs:
   build:
     working_directory: ~/attention_keras
     docker:
-      image: thushv89/attention-keras:tf-1.15.0
+      - image: thushv89/attention-keras:tf-1.15.0
     steps:
-      checkout
+      - checkout

@@ -1,0 +1,15 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+workflows:
+  main:
+    jobs:
+      - build
+jobs:
+  build:
+    working_directory: ~/attention_keras
+    image: thushv89/attention-keras:tf-1.15.0
+    steps:
+      checkout

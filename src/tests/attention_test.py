@@ -45,8 +45,7 @@ def test_attention_layer_standalone_none_b_none_t():
     assert check_tensorshape_equal(e_out.shape, tf.TensorShape([None, None, None]))
 
 
-'''def test_attention_layer_nmt_none_b_fixed_t():
-
+def test_attention_layer_nmt_none_b_fixed_t():
 
     encoder_inputs = Input(shape=(12, 75), name='encoder_inputs')
     decoder_inputs = Input(shape=(16 - 1, 80), name='decoder_inputs')
@@ -75,8 +74,36 @@ def test_attention_layer_standalone_none_b_none_t():
     full_model = Model(inputs=[encoder_inputs, decoder_inputs], outputs=decoder_pred)
     full_model.compile(optimizer='adam', loss='categorical_crossentropy')
 
-    assert decoder_pred.shape == tf.TensorShape([])
+    assert check_tensorshape_equal(decoder_pred.shape, tf.TensorShape([None, 15, 80]))
+
 
 def test_attention_layer_nmt_none_b_none_t():
 
-    pass'''
+    encoder_inputs = Input(shape=(None, 75), name='encoder_inputs')
+    decoder_inputs = Input(shape=(None, 80), name='decoder_inputs')
+
+    # Encoder GRU
+    encoder_gru = GRU(32, return_sequences=True, return_state=True, name='encoder_gru')
+    encoder_out, encoder_state = encoder_gru(encoder_inputs)
+
+    # Set up the decoder GRU, using `encoder_states` as initial state.
+    decoder_gru = GRU(32, return_sequences=True, return_state=True, name='decoder_gru')
+    decoder_out, decoder_state = decoder_gru(decoder_inputs, initial_state=encoder_state)
+
+    # Attention layer
+    attn_layer = AttentionLayer(name='attention_layer')
+    attn_out, attn_states = attn_layer([encoder_out, decoder_out])
+
+    # Concat attention input and decoder GRU output
+    decoder_concat_input = Concatenate(axis=-1, name='concat_layer')([decoder_out, attn_out])
+
+    # Dense layer
+    dense = Dense(80, activation='softmax', name='softmax_layer')
+    dense_time = TimeDistributed(dense, name='time_distributed_layer')
+    decoder_pred = dense_time(decoder_concat_input)
+
+    # Full model
+    full_model = Model(inputs=[encoder_inputs, decoder_inputs], outputs=decoder_pred)
+    full_model.compile(optimizer='adam', loss='categorical_crossentropy')
+
+    assert check_tensorshape_equal(decoder_pred.shape, tf.TensorShape([None, None, 80]))

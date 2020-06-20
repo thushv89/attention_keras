@@ -9,8 +9,12 @@ workflows:
       - build
 jobs:
   build:
-    working_directory: ~/attention_keras
+    working_directory: /app
     docker:
-      - image: thushv89/attention-keras:tf-1.15.0
+      - image: thushv89/attention-keras:tf-1.15.2
     steps:
       - checkout
+      - run:
+          command: |
+            cd /app/src
+            pytest

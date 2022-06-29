@@ -3,7 +3,7 @@
 ## Version (s)
 
 - TensorFlow: 1.15.0 (Tested)
-- TensorFlow: 2.0 (Should be easily portable as all the backend functions are availalbe in TF 2.0. However has not been tested yet.)
+- TensorFlow: 2.x (Should be easily portable as all the backend functions are availalbe in TF 2.0. However has not been tested yet.)
 
 ## Introduction
 

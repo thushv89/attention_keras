@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from examples.utils.config import Config
+from src.examples.utils.config import Config
 
 config = Config()
 

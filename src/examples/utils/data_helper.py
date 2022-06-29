@@ -1,7 +1,7 @@
 import os
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 import numpy as np
-from examples.utils.config import Config
+from src.examples.utils.config import Config
 
 config = Config()
 

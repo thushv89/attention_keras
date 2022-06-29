@@ -1,6 +1,6 @@
 import tensorflow.keras as keras
 
-from tensorflow.python.keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 import numpy as np
 import os, sys
 
@@ -8,11 +8,11 @@ project_path = os.environ.get("PWD")
 if project_path not in sys.path:
     sys.path.append(project_path)
 
-from examples.utils.data_helper import read_data, sents2sequences, get_data
-from examples.nmt.model import define_nmt
-from examples.utils.model_helper import plot_attention_weights
-from examples.utils.logger import get_logger
-from examples.utils.config import Config
+from src.examples.utils.data_helper import read_data, sents2sequences, get_data
+from src.examples.nmt.model import define_nmt
+from src.examples.utils.model_helper import plot_attention_weights
+from src.examples.utils.logger import get_logger
+from src.examples.utils.config import Config
 
 config = Config()
 
@@ -93,7 +93,7 @@ def infer_nmt(encoder_model, decoder_model, test_en_seq, en_vsize, fr_vsize):
 
 if __name__ == '__main__':
 
-    debug = True
+    debug = False
     """ Hyperparameters """
 
     train_size = 100000 if not debug else 10000

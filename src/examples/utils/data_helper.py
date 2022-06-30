@@ -46,3 +46,20 @@ def get_data(train_size, random_seed=100):
     ts_fr_text = [fr_text[ti] for ti in test_inds]
 
     return tr_en_text, tr_fr_text, ts_en_text, ts_fr_text
+
+
+def preprocess_data(en_tokenizer, fr_tokenizer, en_text, fr_text, en_timesteps, fr_timesteps):
+    """ Preprocessing data and getting a sequence of word indices """
+
+    en_seq = sents2sequences(en_tokenizer, en_text, reverse=False, padding_type='pre', pad_length=en_timesteps)
+    fr_seq = sents2sequences(fr_tokenizer, fr_text, pad_length=fr_timesteps)
+
+    return en_seq, fr_seq
+
+
+def compute_vocabulary_size(tokenizer):
+    vsize = max(tokenizer.index_word.keys()) + 1
+    return vsize
+
+def generate_index2word(tokenizer):
+    return dict(zip(tokenizer.word_index.values(), tokenizer.word_index.keys()))

@@ -1,11 +1,16 @@
+import logging
+
 from tensorflow.python.keras.layers import Input, GRU, Dense, Concatenate, TimeDistributed
 from tensorflow.python.keras.models import Model
 from src.layers.attention import AttentionLayer
+
+logger = logging.getLogger(__name__)
 
 
 def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr_vsize):
     """ Defining a NMT model """
 
+    logger.debug("Defining Inputs")
     # Define an input sequence and process it.
     if batch_size:
         encoder_inputs = Input(batch_shape=(batch_size, en_timesteps, en_vsize), name='encoder_inputs')
@@ -17,6 +22,8 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
         else:
             decoder_inputs = Input(shape=(None, fr_vsize), name='decoder_inputs')
 
+    logger.debug("Defining the sequential models")
+
     # Encoder GRU
     encoder_gru = GRU(hidden_size, return_sequences=True, return_state=True, name='encoder_gru')
     encoder_out, encoder_state = encoder_gru(encoder_inputs)
@@ -25,6 +32,7 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     decoder_gru = GRU(hidden_size, return_sequences=True, return_state=True, name='decoder_gru')
     decoder_out, decoder_state = decoder_gru(decoder_inputs, initial_state=encoder_state)
 
+    logger.debug("Defining the attention layer")
     # Attention layer
     attn_layer = AttentionLayer(name='attention_layer')
     attn_out, attn_states = attn_layer([encoder_out, decoder_out])
@@ -32,11 +40,13 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
     # Concat attention input and decoder GRU output
     decoder_concat_input = Concatenate(axis=-1, name='concat_layer')([decoder_out, attn_out])
 
+    logger.debug("Defining the dense layers")
     # Dense layer
     dense = Dense(fr_vsize, activation='softmax', name='softmax_layer')
     dense_time = TimeDistributed(dense, name='time_distributed_layer')
     decoder_pred = dense_time(decoder_concat_input)
 
+    logger.debug("Defining the full model")
     # Full model
     full_model = Model(inputs=[encoder_inputs, decoder_inputs], outputs=decoder_pred)
     full_model.compile(optimizer='adam', loss='categorical_crossentropy')
@@ -45,6 +55,8 @@ def define_nmt(hidden_size, batch_size, en_timesteps, en_vsize, fr_timesteps, fr
 
     """ Inference model """
     batch_size = 1
+
+    logger.debug("Defining the inference model")
 
     """ Encoder (Inference) model """
     encoder_inf_inputs = Input(batch_shape=(batch_size, en_timesteps, en_vsize), name='encoder_inf_inputs')

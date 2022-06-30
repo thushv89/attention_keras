@@ -1,11 +1,9 @@
 import tensorflow as tf
-import os
-from tensorflow.python.keras.layers import Layer
 from tensorflow.python.keras import backend as K
 
 logger = tf.get_logger()
 
-class AttentionLayer(Layer):
+class AttentionLayer(tf.keras.layers.Layer):
     """
     This class implements Bahdanau attention (https://arxiv.org/pdf/1409.0473.pdf).
     There are three sets of weights introduced W_a, U_a, and V_a

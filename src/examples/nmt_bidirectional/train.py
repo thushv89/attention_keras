@@ -1,13 +1,9 @@
 import logging
 
-import tensorflow.keras as keras
+import tensorflow as tf
 
 import numpy as np
-import os, sys
-
-project_path = os.environ.get("PWD")
-if project_path not in sys.path:
-    sys.path.append(project_path)
+import os
 
 import src.examples.utils.data_helper as data_helper
 import src.examples.nmt_bidirectional.model as model
@@ -20,23 +16,17 @@ hidden_size = 96
 en_timesteps, fr_timesteps = 20, 20
 
 
-def run_training(model_save_dir, debug=False):
-
-    """ Hyperparameters """
-
-    train_size = 100000 if not debug else 10000
-
-    tr_en_text, tr_fr_text, ts_en_text, ts_fr_text = data_helper.get_data(train_size=train_size)
+def run_training(input_sentences, target_sentences, model_save_dir, debug=False):
 
     """ Defining tokenizers """
-    en_tokenizer = keras.preprocessing.text.Tokenizer(oov_token='UNK')
-    en_tokenizer.fit_on_texts(tr_en_text)
+    en_tokenizer = tf.keras.preprocessing.text.Tokenizer(oov_token='UNK')
+    en_tokenizer.fit_on_texts(input_sentences)
 
-    fr_tokenizer = keras.preprocessing.text.Tokenizer(oov_token='UNK')
-    fr_tokenizer.fit_on_texts(tr_fr_text)
+    fr_tokenizer = tf.keras.preprocessing.text.Tokenizer(oov_token='UNK')
+    fr_tokenizer.fit_on_texts(target_sentences)
 
     """ Getting preprocessed data """
-    en_seq, fr_seq = data_helper.preprocess_data(en_tokenizer, fr_tokenizer, tr_en_text, tr_fr_text, en_timesteps, fr_timesteps)
+    en_seq, fr_seq = data_helper.preprocess_data(en_tokenizer, fr_tokenizer, input_sentences, target_sentences, en_timesteps, fr_timesteps)
 
     logger.info('Vocabulary size (English): {}'.format(np.max(en_seq) + 1))
     logger.info('Vocabulary size (French): {}'.format(np.max(fr_seq) + 1))

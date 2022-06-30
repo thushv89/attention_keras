@@ -1,9 +1,6 @@
 import os
-from tensorflow.python.keras.preprocessing.sequence import pad_sequences
+import tensorflow as tf
 import numpy as np
-from src.examples.utils.config import Config
-
-config = Config()
 
 def read_data(filename):
     """ Reading the zip file to extract text """
@@ -18,18 +15,18 @@ def read_data(filename):
 
 def sents2sequences(tokenizer, sentences, reverse=False, pad_length=None, padding_type='post'):
     encoded_text = tokenizer.texts_to_sequences(sentences)
-    preproc_text = pad_sequences(encoded_text, padding=padding_type, maxlen=pad_length)
+    preproc_text = tf.keras.preprocessing.sequence.pad_sequences(encoded_text, padding=padding_type, maxlen=pad_length)
     if reverse:
         preproc_text = np.flip(preproc_text, axis=1)
 
     return preproc_text
 
 
-def get_data(train_size, random_seed=100):
+def get_data(data_dir, train_size, random_seed=100):
 
     """ Getting randomly shuffled training / testing data """
-    en_text = read_data(os.path.join(config.DATA_DIR, 'small_vocab_en.txt'))
-    fr_text = read_data(os.path.join(config.DATA_DIR, 'small_vocab_fr.txt'))
+    en_text = read_data(os.path.join(data_dir, 'small_vocab_en.txt'))
+    fr_text = read_data(os.path.join(data_dir, 'small_vocab_fr.txt'))
 
     fr_text = ['sos ' + sent[:-1] + 'eos .'  if sent.endswith('.') else 'sos ' + sent + ' eos .' for sent in fr_text]
 

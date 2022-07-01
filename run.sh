@@ -1,5 +1,5 @@
-TF_VERSION=1.15.2
-GPU_TAG="-gpu" # Set this -gpu for the GPU version or to empty if you want the CPU version
+TF_VERSION=2.9.1
+GPU_TAG="" # Set this -gpu for the GPU version or to empty if you want the CPU version
 
 docker build --build-arg GPU_TAG=${GPU_TAG} --build-arg TF_VERSION=${TF_VERSION} -t attention-keras:tf-${TF_VERSION}${GPU_TAG} .
 

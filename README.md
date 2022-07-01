@@ -1,9 +1,8 @@
 # Keras Attention Layer
 
 ## Version (s)
-
+- TensorFlow: 2.9.1 (Tested)
 - TensorFlow: 1.15.0 (Tested)
-- TensorFlow: 2.0 (Should be easily portable as all the backend functions are availalbe in TF 2.0. However has not been tested yet.)
 
 ## Introduction
 
@@ -15,18 +14,16 @@ This is an implementation of Attention (only supports [Bahdanau Attention](https
 data (Download data and place it here)
  |--- small_vocab_en.txt
  |--- small_vocab_fr.txt
-layers
- |--- attention.py (Attention implementation)
-examples
- |--- nmt
-   |--- model.py (NMT model defined with Attention)
-   |--- train.py ( Code for training/inferring/plotting attention with NMT model)
-   |--- train_variable_length_seq.py ( Code for training/inferring with variable length sequences)
- |--- nmt_bidirectional
-   |--- model.py (NMT birectional model defined with Attention)
-   |--- train.py ( Code for training/inferring/plotting attention with NMT model)
-models (created by train_nmt.py to store model)
-results (created by train_nmt.py to store model)
+src
+ |--- layers
+       |--- attention.py (Attention implementation)
+ |--- examples
+       |--- nmt
+             |--- model.py (NMT model defined with Attention)
+             |--- train.py ( Code for training/inferring/plotting attention with NMT model)
+       |--- nmt_bidirectional
+             |--- model.py (NMT birectional model defined with Attention)
+             |--- train.py ( Code for training/inferring/plotting attention with NMT model)
 
 ```
 ## How to use
@@ -34,7 +31,7 @@ results (created by train_nmt.py to store model)
 Just like you would use any other `tensoflow.python.keras.layers` object.
 
 ```python
-from attention_keras.layers.attention import AttentionLayer
+from attention_keras.src.layers.attention import AttentionLayer
 
 attn_layer = AttentionLayer(name='attention_layer')
 attn_out, attn_states = attn_layer([encoder_outputs, decoder_outputs])

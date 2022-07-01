@@ -4,6 +4,5 @@ FROM tensorflow/tensorflow:${TF_VERSION}${GPU_TAG}
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 ENV PYTHONPATH=/app/src
-ADD src /app/src
 WORKDIR app/
 

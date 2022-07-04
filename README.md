@@ -2,7 +2,7 @@
 
 ## Version (s)
 - TensorFlow: 2.9.1 (Tested)
-- TensorFlow: 1.15.0 (Tested)
+- TensorFlow: 1.15.0 (Soon to be deprecated)
 
 ## Introduction
 
@@ -60,7 +60,9 @@ After the model trained attention result should look like below.
 
 ### Using the docker image
 * If you would like to run this in the docker environment, simply running `run.sh` will take you inside the docker container.
-* Set the `GPU_TAG` in the `run.sh` appropriately depending on whether you need the GPU version of the CPU version
+* E.g. usage `run.sh -v <TF_VERSION> [-g]`
+  * `-v` specifies the TensorFlow version (defaults to `latest`)
+  * `-g` if specified use the GPU compatible Docker image
 
 ### Using a virtual environment
 * If you would like to use a virtual environment, first create and activate the virtual environment. 

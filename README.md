@@ -1,5 +1,7 @@
 # Keras Attention Layer
 
+[![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=sheild)](https://circleci.com/gh/thushv89/attention_keras)
+
 ## Version (s)
 - TensorFlow: 2.9.1 (Tested)
 - TensorFlow: 1.15.0 (Soon to be deprecated)

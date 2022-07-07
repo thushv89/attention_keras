@@ -1,6 +1,6 @@
-# Keras Attention Layer
+# TensorFlow (Keras) Attention Layer for RNN based models
 
-[![CircleCI](https://circleci.com/gh/circleci/circleci-docs.svg?style=sheild)](https://circleci.com/gh/thushv89/attention_keras)
+![![Build Status (CircleCI)](https://circleci.com/gh/circleci/circleci-docs.svg?style=sheild)](https://img.shields.io/circleci/build/gh/thushv89/attention_keras)
 
 ## Version (s)
 - TensorFlow: 2.9.1 (Tested)

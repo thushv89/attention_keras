@@ -76,6 +76,11 @@ After the model trained attention result should look like below.
 * Go to the <project dir>. Any example you run, you should run from the <project dir> folder (the main folder). Otherwise, you will run into problems with finding/writing data.
 * Run  `python3 src/examples/nmt/train.py`. Set `degug=True` if you need to run simple and faster.
 * If run successfully, you should have models saved in the model dir and `attention.png` in the `results` dir.
+
+## If you would like to show support
+
+If you'd like to show your appreciation you can [buy me a coffee](https://www.buymeacoffee.com/thushv89). No stress! It's totally optional. The support I recieved would definitely an added benefit to maintain the repository and continue on my other contributions. 
+
 ___
 
 If you have improvements (e.g. other attention mechanisms), contributions are welcome!
